@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://framework-gb.cdn.gob.mx/assets/styles/main.css" rel="stylesheet">
+
+
+
+</head>
+
+<body>
+    <main class="page" style="width:100%;"></main>
+
+    <section class="section section-intro flag-banner" style="background: transparent url(https://www.gob.mx/cms/uploads/identity/image/30930/background_34.jpg) no-repeat center center; background-size: cover; top:0; height:200px">
+        <div id="videoContainer" class="video-container" style="position: absolute; top: 0;"></div>
+        <div class="container">
+            <div class="section-intro__content" style="color: transparent;">
+                <h1>-</h1>
+                <p class="text-border">-</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <div id="divcurp" class="mainbox col-md-8 col-md-offset-2 col-sm-8 " style=" margin-top:50px; display:flex; align-items: center;">
+            <div class="panel panel-default" style=" width: 100%;">
+                <div class="panel-heading">
+                    <div class="panel-title">Validación de Vacunación:</div>
+                </div>
+                <div style="padding-top:30px" class="panel-body">
+
+
+                    <div id="tieneCurpContent">
+                        <div style="margin-bottom: 25px" class="input-group">
+
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input id="id1" type="text" value="f26a74c0-525b-40c8-bfc3-12e950d6cf34" name="id1" placeholder="Introducir Clave de Vacunación" required="">
+
+                        </div>
+                        <div style="margin-bottom: 25px" class="input-group">
+
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input id="id2" type="text" value="1634273729048" name="id2" placeholder="Introducir Código de Vacunación" required="">
+                            <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+                        </div>
+
+                    </div>
+
+                    <div>
+                        <div style="margin-top:10px" class="form-group">
+                            <div class="col-sm-12 controls">
+                                <div class="g-recaptcha" data-sitekey="6LfPTTgeAAAAAJj4AFzKfU3RYMcld7FTWCkX90Kp" data-callback="validaCheckbox" id="captcha"></div>
+                                </br>
+                                <button onclick="window.location.href='https://cvcovid-salud-gob-mx.github.io/index2compruebaVacuna-id1-1634273729048-id2-f26a74c0-525b-40c8-bfc3-12e950d6cf34.html
+';" type="button " class="btn btn-primary col-md-12" onclick="buscarInfo()" id="buscar">Buscar</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://framework-gb.cdn.gob.mx/gobmx.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            var url_string = window.location.href; // www.test.com?filename=test
+            var url = new URL(url_string);
+            var paramValue = url.searchParams.get("id1");
+            var paramValue2 = url.searchParams.get("id2");
+
+            if (paramValue != null || paramValue2 != null) {
+                document.getElementById("id2").value = paramValue
+                document.getElementById("id1").value = paramValue2
+            }
+
+            function getCveVacunacion() {
+                return document.getElementById("id1").value
+
+            }
+
+            function getCodigo() {
+                return document.getElementById("id2").value
+            }
+
+
+            function buscarInfo() {
+                var mensaje = ""
+                var icono = ""
+                var texto = ""
+                var datos = {
+                    'id1': getCveVacunacion(),
+                    'id2': getCodigo(),
+                    'response': grecaptcha.getResponse()
+                };
+                const URL = '/compruebaVacuna/vacunacionRequest.php'
+                $.ajax({
+                    url: URL,
+                    type: "POST",
+                    data: datos,
+                    success: function(result) {
+                        var r = result.split("||")
+
+                        if (r[0] != "200") {
+                            mensaje = "No Autorizado."
+                            icono = "error"
+                        } else {
+
+                            var parse = JSON.parse(r[1])
+
+
+
+                            // var content = document.createElement('div')
+                            // content.innerHTML = `<b>${valor1[0]}:</b> ${valor1[1]} \n\n <b>${valor2[0]}:</b> ${valor2[1]} \n\n <b>${valor3[0]}:${valor3[1]}</b>`
+
+                            if (parse.codigoE == "EXITOSO") {
+
+                                console.log(parse)
+                                console.log(parse.A1)
+                                var info = parse.A1.split(',')
+                                var valor1 = info[0].split('|')
+                                var valor2 = info[1].split('|')
+                                var valor3 = info[2].split('|')
+				var valor4 = info[3].split('|')
+				var valor5 = info[4].split('|')
+                                console.log("info", info)
+                                console.log(`${valor1[0]}: ${valor1[1]} \n\n ${valor2[0]}: ${valor2[1]} \n\n ${valor3[0]}: ${valor3[1]}`)
+                                mensaje = "QR. Valido: Para validar el Certificado, los siguientes datos deberán coincidir exactamente con los del documento presentado."
+                                    // text = valor1[0] + ": " + valor1[1] + "\n\n" + valor2[0] + ": " + valor2[1] + "\n\n" + valor3[0] + ": " + valor3[1]
+                                texto = `${valor1[0]}: ${valor1[1]} \n\n ${valor2[0]}: ${valor2[1]} \n\n ${valor3[0]}: ${valor3[1]} \n\n ${valor4[0]}: ${valor4[1]} \n\n ${valor5[0]}: ${valor5[1]}`
+                                icono = "success"
+                            } else {
+                                mensaje = "No Autorizado.\nPor favor recargar el captcha"
+                                texto = ""
+                                icono = "error"
+
+                            }
+                        }
+                        swal({
+                            title: mensaje,
+                            text: texto,
+                            icon: icono,
+                        });
+                    },
+                    error: function(error) {
+                        console.log(error)
+                        mensaje = error
+                        icono = "error"
+                        swal({
+                            title: mensaje,
+                            text: "",
+                            icon: icono,
+                        });
+                    }
+                })
+            }
+        </script>
+
+
+</div><footer class="main-footer"><div class="list-info"><div class="container"><div class="row"><div class="col-sm-3"><img data-v-9e928f9a="" src="./Document_files/logoheader.svg" href="/" alt="logo gobierno de mÃƒÂ©xico" class="logo_footer" style="max-width: 90%;"></div><div class="col-sm-3"><h5>Enlaces</h5><ul><li><a href="https://participa.gob.mx/" target="_blank" rel="noopener" title="Enlace abre en ventana nueva">Participa</a></li><li><a href="https://www.gob.mx/publicaciones" target="_blank" rel="noopener" title="Enlace abre en ventana nueva">Publicaciones Oficiales</a></li><li><a href="http://www.ordenjuridico.gob.mx/" target="_blank" rel="noopener" title="Enlace abre en ventana nueva">Marco Jurídico</a></li><li><a href="https://consultapublicamx.inai.org.mx/vut-web/" target="_blank" rel="noopener" title="Enlace abre en ventana nueva">Plataforma Nacional de Transparencia</a></li><li><a href="https://alertadores.funcionpublica.gob.mx/" target="_blank" rel="noopener" title="Enlace abre en ventana nueva">Alerta</a></li><li><a href="https://sidec.funcionpublica.gob.mx/" target="_blank" rel="noopener" title="Enlace abre en ventana nueva">Denuncia</a></li></ul></div><div class="col-sm-3"><h5>¿Qué es gob.mx?</h5><p>Es el portal único de trámites, información y participación ciudadana. <a href="https://www.gob.mx/que-es-gobmx">Leer más</a></p><ul><li><a href="https://datos.gob.mx/">Portal de datos abiertos</a></li><li><a href="https://www.gob.mx/accesibilidad">Declaración de accesibilidad</a></li><li><a href="https://www.gob.mx/privacidadintegral">Aviso de privacidad integral</a></li><li><a href="https://www.gob.mx/privacidadsimplificado">Aviso de privacidad simplificado</a></li><li><a href="https://www.gob.mx/terminos">Términos y Condiciones</a></li><li><a href="https://www.gob.mx/terminos#medidas-seguridad-informacion">Política de seguridad</a></li><li><a href="https://www.gob.mx/sitemap">Mapa de sitio</a></li></ul></div><div class="col-sm-3"><h5><a href="https://www.gob.mx/tramites/ficha/presentacion-de-quejas-y-denuncias-en-la-sfp/SFP54">Denuncia contra servidores públicos</a></h5><h5>Síguenos en</h5><ul class="list-inline"><li><a class="social-icon facebook" target="_blank" rel="noopener" title="Enlace abre en ventana nueva" href="https://www.facebook.com/gobmexico" aria-label="Facebook de presidencia"></a></li><li><a class="social-icon twitter" target="_blank" rel="noopener" title="Enlace abre en ventana nueva" href="https://twitter.com/GobiernoMX" aria-label="Twitter de presidencia"></a></li></ul></div></div></div></div><div class="container-fluid footer-pleca"><div class="row"><div class="col"><br><br></div></div></div></footer><div class="swal-overlay swal-overlay--show-modal" tabindex="-1">
+<div class="swal-modal" role="dialog" aria-modal="true"><div class="swal-icon swal-icon--success">
+    <span class="swal-icon--success__line swal-icon--success__line--long"></span>
+    <span class="swal-icon--success__line swal-icon--success__line--tip"></span>
+
+    <div class="swal-icon--success__ring"></div>
+    <div class="swal-icon--success__hide-corners"></div>
+  </div><div class="swal-title" style="">QR. Valido: Para validar el Certificado, los siguientes datos deberán coincidir exactamente con los del documento presentado.</div><div class="swal-text" style="">Fecha de emisión: 2021-10-20 15:27:41 <br><br> CURP: MAMH840520HCLRDC04 <br><br> Primer apellido: MAR <br><br> Fecha de aplicacion dosis 1: 2021-03-03 <br><br> Marca Dosis 2: Pfizer</div><div class="swal-footer"><div class="swal-button-container">
+
+    <button onclick="self.close()" class="swal-button swal-button--confirm">OK</button>
+
+    <div class="swal-button__loader">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+
+  </div></div></div></div><div style="background-color: rgb(255, 255, 255); border: 1px solid rgb(204, 204, 204); box-shadow: rgba(0, 0, 0, 0.2) 2px 2px 3px; position: absolute; transition: visibility 0s linear 0.3s, opacity 0.3s linear 0s; opacity: 0; visibility: hidden; z-index: 2000000000; left: 476.6px; top: -10000px;"><div style="width: 100%; height: 100%; position: fixed; top: 0px; left: 0px; z-index: 2000000000; background-color: rgb(255, 255, 255); opacity: 0.05;"></div><div class="g-recaptcha-bubble-arrow" style="border-width: 11px; border-style: solid; border-color: transparent rgb(204, 204, 204) transparent transparent; border-image: initial; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -11px; z-index: 2000000000; top: 378.6px; right: 100%;"></div><div class="g-recaptcha-bubble-arrow" style="border-width: 10px; border-style: solid; border-color: transparent rgb(255, 255, 255) transparent transparent; border-image: initial; width: 0px; height: 0px; position: absolute; pointer-events: none; margin-top: -10px; z-index: 2000000000; top: 378.6px; right: 100%;"></div><div style="z-index: 2000000000; position: relative; width: 400px; height: 580px;"><iframe title="recaptcha challenge expires in two minutes" src="./Document_files/bframe.html" name="c-iahz9c5ogk5s" frameborder="0" scrolling="no" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation allow-modals allow-popups-to-escape-sandbox allow-storage-access-by-user-activation" style="width: 400px; height: 580px;"></iframe></div></div>
+
+
+</body>
+
+</html>
