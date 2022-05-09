@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://framework-gb.cdn.gob.mx/assets/styles/main.css" rel="stylesheet">
+
+
+
+</head>
+
+<body>
+    <main class="page" style="width:100%;"></main>
+
+    <section class="section section-intro flag-banner" style="background: transparent url(https://www.gob.mx/cms/uploads/identity/image/30930/background_34.jpg) no-repeat center center; background-size: cover; top:0; height:200px">
+        <div id="videoContainer" class="video-container" style="position: absolute; top: 0;"></div>
+        <div class="container">
+            <div class="section-intro__content" style="color: transparent;">
+                <h1>-</h1>
+                <p class="text-border">-</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="container">
+        <div id="divcurp" class="mainbox col-md-8 col-md-offset-2 col-sm-8 " style=" margin-top:50px; display:flex; align-items: center;">
+            <div class="panel panel-default" style=" width: 100%;">
+                <div class="panel-heading">
+                    <div class="panel-title">Validación de Vacunación:</div>
+                </div>
+                <div style="padding-top:30px" class="panel-body">
+
+
+                    <div id="tieneCurpContent">
+                        <div style="margin-bottom: 25px" class="input-group">
+
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input id="id1" type="text" value="f26a74c0-525b-40c8-bfc3-12e950d6cf34" name="id1" placeholder="Introducir Clave de Vacunación" required="">
+
+                        </div>
+                        <div style="margin-bottom: 25px" class="input-group">
+
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                            <input id="id2" type="text" value="1634273729048" name="id2" placeholder="Introducir Código de Vacunación" required="">
+                            <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+                        </div>
+
+                    </div>
+
+                    <div>
+                        <div style="margin-top:10px" class="form-group">
+                            <div class="col-sm-12 controls">
+                                <div class="g-recaptcha" data-sitekey="6LfPTTgeAAAAAJj4AFzKfU3RYMcld7FTWCkX90Kp" data-callback="validaCheckbox" id="captcha"></div>
+                                </br>
+                                <button onclick="window.location.href='https://cvcovid-salud-gob-mx.github.io/index2compruebaVacuna-id1-1634273729048-id2-f26a74c0-525b-40c8-bfc3-12e950d6cf34.html
+';" type="button " class="btn btn-primary col-md-12" onclick="buscarInfo()" id="buscar">Buscar</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <script src="https://framework-gb.cdn.gob.mx/gobmx.js"></script>
+        <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+        <script>
+            var url_string = window.location.href; // www.test.com?filename=test
+            var url = new URL(url_string);
+            var paramValue = url.searchParams.get("id1");
+            var paramValue2 = url.searchParams.get("id2");
+
+            if (paramValue != null || paramValue2 != null) {
+                document.getElementById("id2").value = paramValue
+                document.getElementById("id1").value = paramValue2
+            }
+
+            function getCveVacunacion() {
+                return document.getElementById("id1").value
+
+            }
+
+            function getCodigo() {
+                return document.getElementById("id2").value
+            }
+
+
+            function buscarInfo() {
+                var mensaje = ""
+                var icono = ""
+                var texto = ""
+                var datos = {
+                    'id1': getCveVacunacion(),
+                    'id2': getCodigo(),
+                    'response': grecaptcha.getResponse()
+                };
+                const URL = '/compruebaVacuna/vacunacionRequest.php'
+                $.ajax({
+                    url: URL,
+                    type: "POST",
+                    data: datos,
+                    success: function(result) {
+                        var r = result.split("||")
+
+                        if (r[0] != "200") {
+                            mensaje = "No Autorizado."
+                            icono = "error"
+                        } else {
+
+                            var parse = JSON.parse(r[1])
+
+
+
+                            // var content = document.createElement('div')
+                            // content.innerHTML = `<b>${valor1[0]}:</b> ${valor1[1]} \n\n <b>${valor2[0]}:</b> ${valor2[1]} \n\n <b>${valor3[0]}:${valor3[1]}</b>`
+
+                            if (parse.codigoE == "EXITOSO") {
+
+                                console.log(parse)
+                                console.log(parse.A1)
+                                var info = parse.A1.split(',')
+                                var valor1 = info[0].split('|')
+                                var valor2 = info[1].split('|')
+                                var valor3 = info[2].split('|')
+				var valor4 = info[3].split('|')
+				var valor5 = info[4].split('|')
+                                console.log("info", info)
+                                console.log(`${valor1[0]}: ${valor1[1]} \n\n ${valor2[0]}: ${valor2[1]} \n\n ${valor3[0]}: ${valor3[1]}`)
+                                mensaje = "QR. Valido: Para validar el Certificado, los siguientes datos deberán coincidir exactamente con los del documento presentado."
+                                    // text = valor1[0] + ": " + valor1[1] + "\n\n" + valor2[0] + ": " + valor2[1] + "\n\n" + valor3[0] + ": " + valor3[1]
+                                texto = `${valor1[0]}: ${valor1[1]} \n\n ${valor2[0]}: ${valor2[1]} \n\n ${valor3[0]}: ${valor3[1]} \n\n ${valor4[0]}: ${valor4[1]} \n\n ${valor5[0]}: ${valor5[1]}`
+                                icono = "success"
+                            } else {
+                                mensaje = "No Autorizado.\nPor favor recargar el captcha"
+                                texto = ""
+                                icono = "error"
+
+                            }
+                        }
+                        swal({
+                            title: mensaje,
+                            text: texto,
+                            icon: icono,
+                        });
+                    },
+                    error: function(error) {
+                        console.log(error)
+                        mensaje = error
+                        icono = "error"
+                        swal({
+                            title: mensaje,
+                            text: "",
+                            icon: icono,
+                        });
+                    }
+                })
+            }
+        </script>
+
+</body>
+
+</html>
